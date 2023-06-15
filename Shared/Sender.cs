@@ -43,6 +43,7 @@ namespace Shared
             {
                 var end_point = new IPEndPoint(IPAddress.Parse(serverIp), serverPort);
 
+
                 using (UdpClient udp_client = new UdpClient())
                 {
                     var lastno = data.Length / packetSize + (data.Length % packetSize > 0 ? 1 : 0);
