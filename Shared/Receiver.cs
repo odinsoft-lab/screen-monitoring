@@ -1,8 +1,8 @@
 ﻿using System.Drawing;
-using System.Drawing.Imaging;
 using System.Net;
 using System.Net.Sockets;
-using System.Windows.Forms;
+using System.Text;
+using System.Text.Json;
 
 #pragma warning disable
 
@@ -10,34 +10,37 @@ namespace Shared
 {
     public class Receiver
     {
-
-        public async Task ReceiveData(int listenPort)
+        public Packet DeserializePacket(byte[] data)
         {
-            UdpClient udpClient = new UdpClient(listenPort);
-            udpClient.Client.ReceiveBufferSize = 1024 * 1024; // 1MB
+            string jsonString = Encoding.UTF8.GetString(data);
+            return JsonSerializer.Deserialize<Packet>(jsonString);
+        }
+
+        public byte[] RecvData(UdpClient client)
+        {
+            var total_data = new List<byte>(new byte[100 * 1024]); // 전체 데이터 크기를 미리 설정합니다.
 
             try
             {
                 while (true)
                 {
-                    IPEndPoint remoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-                    byte[] receiveBytes = udpClient.Receive(ref remoteIpEndPoint);
+                    var remoteEP = new IPEndPoint(IPAddress.Any, 0);
+                    var recv_data = client.Receive(ref remoteEP);
 
-                    // Process received data
-                    var capture = ByteArrayToImage(receiveBytes);
-                    this.pictureBox1.Image = capture;
+                    var packet = DeserializePacket(recv_data);
+                    Array.Copy(packet.data, 0, total_data.ToArray(), packet.seqno * packet.size, packet.data.Length);
 
-                    await Task.Delay(100);
+                    // 모든 패킷을 받았다면 루프를 종료합니다.
+                    if (packet.seqno >= packet.lastno)
+                        break;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
-            finally
-            {
-                udpClient.Close();
-            }
+
+            return total_data.ToArray();
         }
 
         public Image ByteArrayToImage(byte[] byteArray)

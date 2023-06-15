@@ -2,6 +2,8 @@
 using System.Drawing.Imaging;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
+using System.Text.Json;
 using System.Windows.Forms;
 
 #pragma warning disable
@@ -10,7 +12,44 @@ namespace Shared
 {
     public class Sender
     {
-        public byte[] CaptureScreenToJpegByteArray()
+        public byte[] SerializePacket(Packet packet)
+        {
+            string jsonString = JsonSerializer.Serialize(packet);
+            return Encoding.UTF8.GetBytes(jsonString);
+        }
+
+        public void SendData(string serverIp, int serverPort, byte[] data, int packetSize)
+        {
+            try
+            {
+                var end_point = new IPEndPoint(IPAddress.Parse(serverIp), serverPort);
+
+                using (UdpClient udp_client = new UdpClient())
+                {
+                    var lastno = data.Length / packetSize + (data.Length % packetSize > 0 ? 1 : 0);
+                    var offset = 0;
+
+                    for (int i = 0; i < lastno; i++)
+                    {
+                        var size = Math.Min(packetSize, data.Length - offset);
+                        var packet_data = new byte[size];
+                        Array.Copy(data, offset, packet_data, 0, size);
+
+                        offset += size;
+
+                        var packet = new Packet { seqno = i, size = packetSize, lastno = lastno, data = packet_data };
+                        var send_data = SerializePacket(packet);
+                        udp_client.Send(send_data, send_data.Length, end_point);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public byte[] CaptureScreen()
         {
             var bounds = Screen.GetBounds(Point.Empty);
             var bitmap = new Bitmap(bounds.Width, bounds.Height);
@@ -24,36 +63,6 @@ namespace Shared
             {
                 bitmap.Save(memoryStream, ImageFormat.Jpeg);
                 return memoryStream.ToArray();
-            }
-        }
-
-        public void SendPackets(UdpClient client, IPEndPoint remoteEndPoint, byte[] data, int packetSize)
-        {
-            for (int i = 0; i < data.Length; i += packetSize)
-            {
-                int size = Math.Min(packetSize, data.Length - i);
-                byte[] packet = new byte[size];
-                Array.Copy(data, i, packet, 0, size);
-                client.Send(packet, packet.Length, remoteEndPoint);
-            }
-        }
-
-        public void SendData(string serverIp, int serverPort, byte[] data)
-        {
-            UdpClient udpClient = new UdpClient();
-
-            try
-            {
-                udpClient.Connect(serverIp, serverPort);
-                udpClient.Send(data, data.Length);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                udpClient.Close();
             }
         }
     }
