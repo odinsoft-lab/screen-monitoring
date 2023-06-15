@@ -17,12 +17,9 @@ namespace Shared
             return JsonSerializer.Deserialize<Packet>(jsonString);
         }
 
-        public async Task<Packet> RecvDataByTCP(int port)
+        public async Task<Packet> RecvDataByTCP(TcpListener listener)
         {
             var result = new Packet();
-
-            var listener = new TcpListener(IPAddress.Any, port);
-            listener.Start();
 
             using TcpClient client = await listener.AcceptTcpClientAsync();
             using NetworkStream stream = client.GetStream();

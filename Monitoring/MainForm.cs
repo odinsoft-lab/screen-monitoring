@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Monitoring
@@ -14,12 +15,17 @@ namespace Monitoring
         {
             Task.Factory.StartNew(async () =>
             {
+                var receiver = new Shared.Receiver();
+
+                var listener = new TcpListener(IPAddress.Any, 8088);
+
                 while (true)
                 {
-                    UdpClient udpClient = new UdpClient(8088);
+                    Debug.WriteLine("listen...");
 
-                    var receiver = new Shared.Receiver();
-                    var packet = await receiver.RecvDataByTCP(8088);
+                    listener.Start();
+
+                    var packet = await receiver.RecvDataByTCP(listener);
 
                     this.BeginInvoke(() =>
                     {
@@ -29,7 +35,9 @@ namespace Monitoring
                         pictureBox1.Image = capture;
                     });
 
-                    await Task.Delay(100);
+                    listener.Stop();
+
+                    await Task.Delay(1000);
                 }
             },
             TaskCreationOptions.LongRunning
