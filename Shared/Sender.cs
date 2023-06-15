@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
+using System.Net;
 using System.Net.Sockets;
 using System.Windows.Forms;
 
@@ -23,6 +24,17 @@ namespace Shared
             {
                 bitmap.Save(memoryStream, ImageFormat.Jpeg);
                 return memoryStream.ToArray();
+            }
+        }
+
+        public void SendPackets(UdpClient client, IPEndPoint remoteEndPoint, byte[] data, int packetSize)
+        {
+            for (int i = 0; i < data.Length; i += packetSize)
+            {
+                int size = Math.Min(packetSize, data.Length - i);
+                byte[] packet = new byte[size];
+                Array.Copy(data, i, packet, 0, size);
+                client.Send(packet, packet.Length, remoteEndPoint);
             }
         }
 
