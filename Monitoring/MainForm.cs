@@ -19,7 +19,7 @@ namespace Monitoring
                     UdpClient udpClient = new UdpClient(8088);
 
                     var receiver = new Shared.Receiver();
-                    var packet = receiver.RecvData(udpClient);
+                    var packet = await receiver.RecvDataByTCP(8088);
 
                     this.BeginInvoke(() =>
                     {

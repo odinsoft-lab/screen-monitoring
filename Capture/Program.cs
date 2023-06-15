@@ -13,7 +13,7 @@ public class Program
 
         Console.WriteLine($"send data size: {data.Length}");
 
-        await sender.SendData("192.168.0.5", 8088, data, 1024);
+        await sender.SendDataByTCP("192.168.0.5", 8088, data);
 
         Console.WriteLine("hit to exit...");
         Console.ReadLine();

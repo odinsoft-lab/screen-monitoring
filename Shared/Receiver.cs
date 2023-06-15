@@ -17,7 +17,31 @@ namespace Shared
             return JsonSerializer.Deserialize<Packet>(jsonString);
         }
 
-        public Packet RecvData(UdpClient client)
+        public async Task<Packet> RecvDataByTCP(int port)
+        {
+            var result = new Packet();
+
+            var listener = new TcpListener(IPAddress.Any, port);
+            listener.Start();
+
+            using TcpClient client = await listener.AcceptTcpClientAsync();
+            using NetworkStream stream = client.GetStream();
+            using MemoryStream ms = new MemoryStream();
+
+            var buffer = new byte[1024];
+            
+            int bytesRead;
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                ms.Write(buffer, 0, bytesRead);
+            }
+
+            result.data = ms.ToArray();
+
+            return result;
+        }
+
+        public Packet RecvDataByUDP(UdpClient client)
         {
             var result = new Packet();
 

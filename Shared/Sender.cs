@@ -19,7 +19,25 @@ namespace Shared
             return Encoding.UTF8.GetBytes(jsonString);
         }
 
-        public async Task SendData(string serverIp, int serverPort, byte[] data, int packetSize)
+        public async Task SendDataByTCP(string ipAddress, int port, byte[] data)
+        {
+            try
+            {
+                using (TcpClient client = new TcpClient())
+                {
+                    await client.ConnectAsync(ipAddress, port);
+
+                    using NetworkStream stream = client.GetStream();
+                    await stream.WriteAsync(data, 0, data.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+        }
+
+        public async Task SendDataByUDP(string serverIp, int serverPort, byte[] data, int packetSize)
         {
             try
             {
