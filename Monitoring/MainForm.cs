@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net.Sockets;
 
 namespace Monitoring
@@ -18,11 +19,13 @@ namespace Monitoring
                     UdpClient udpClient = new UdpClient(8088);
 
                     var receiver = new Shared.Receiver();
-                    var data = receiver.RecvData(udpClient);
+                    var packet = receiver.RecvData(udpClient);
 
                     this.BeginInvoke(() =>
                     {
-                        var capture = receiver.ByteArrayToImage(data);
+                        Debug.WriteLine($"recv data: {packet.data.Length}");
+
+                        var capture = receiver.ByteArrayToImage(packet.data);
                         pictureBox1.Image = capture;
                     });
 

@@ -51,12 +51,10 @@ namespace Shared
 
         public byte[] CaptureScreen()
         {
-            var bounds = Screen.GetBounds(Point.Empty);
-            var bitmap = new Bitmap(bounds.Width, bounds.Height);
-
-            using (var graphics = Graphics.FromImage(bitmap))
+            var bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            using (Graphics g = Graphics.FromImage(bitmap))
             {
-                graphics.CopyFromScreen(Point.Empty, Point.Empty, bounds.Size);
+                g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
             }
 
             using (var memoryStream = new MemoryStream())

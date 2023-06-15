@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -16,9 +17,11 @@ namespace Shared
             return JsonSerializer.Deserialize<Packet>(jsonString);
         }
 
-        public byte[] RecvData(UdpClient client)
+        public Packet RecvData(UdpClient client)
         {
-            var total_data = new List<byte>(new byte[100 * 1024]); // 전체 데이터 크기를 미리 설정합니다.
+            var result = new Packet();
+
+            var total_data = new byte[256 * 1024];
 
             try
             {
@@ -28,19 +31,23 @@ namespace Shared
                     var recv_data = client.Receive(ref remoteEP);
 
                     var packet = DeserializePacket(recv_data);
-                    Array.Copy(packet.data, 0, total_data.ToArray(), packet.seqno * packet.size, packet.data.Length);
+                    Array.Copy(packet.data, 0, total_data, packet.seqno * packet.size, packet.data.Length);
+
+                    Debug.WriteLine($"recv packet: {packet.seqno} / {packet.lastno}");
 
                     // 모든 패킷을 받았다면 루프를 종료합니다.
-                    if (packet.seqno >= packet.lastno)
+                    if (packet.seqno >= packet.lastno - 1)
                         break;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
 
-            return total_data.ToArray();
+            result.data = total_data.ToArray();
+
+            return result;
         }
 
         public Image ByteArrayToImage(byte[] byteArray)
