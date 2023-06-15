@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net;
 using System.Net.Sockets;
@@ -18,7 +19,7 @@ namespace Shared
             return Encoding.UTF8.GetBytes(jsonString);
         }
 
-        public void SendData(string serverIp, int serverPort, byte[] data, int packetSize)
+        public async Task SendData(string serverIp, int serverPort, byte[] data, int packetSize)
         {
             try
             {
@@ -40,12 +41,16 @@ namespace Shared
                         var packet = new Packet { seqno = i, size = packetSize, lastno = lastno, data = packet_data };
                         var send_data = SerializePacket(packet);
                         udp_client.Send(send_data, send_data.Length, end_point);
+
+                        Debug.WriteLine($"send packet: {i} / {lastno}");
+
+                        await Task.Delay(500);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
 

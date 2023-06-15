@@ -2,7 +2,7 @@
 
 public class Program
 {
-    static void Main(string[] args)
+    static async Task Main(string[] args)
     {
         Console.WriteLine("hit to capture & send...");
         Console.ReadLine();
@@ -13,7 +13,7 @@ public class Program
 
         Console.WriteLine($"send data size: {data.Length}");
 
-        sender.SendData("192.168.0.5", 8088, data, 1024);
+        await sender.SendData("192.168.0.5", 8088, data, 1024);
 
         Console.WriteLine("hit to exit...");
         Console.ReadLine();
