@@ -9,13 +9,18 @@ public class Program
 
         var sender = new Shared.Sender();
 
-        var data = sender.CaptureScreen();
+        while (true)
+        {
+            var data = sender.CaptureScreen();
 
-        Console.WriteLine($"send data size: {data.Length}");
+            Console.WriteLine($"send data size: {data.Length}");
 
-        await sender.SendDataByTCP("192.168.0.5", 8088, data);
+            await sender.SendDataByTCP("127.0.0.1", 8088, data);
 
-        Console.WriteLine("hit to exit...");
-        Console.ReadLine();
+            await Task.Delay(10);
+        }
+
+        //Console.WriteLine("hit to exit...");
+        //Console.ReadLine();
     }
 }

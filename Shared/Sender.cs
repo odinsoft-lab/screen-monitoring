@@ -81,7 +81,7 @@ namespace Shared
                 g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
             }
 
-            bitmap.Save("screen.png", ImageFormat.Png);
+            //bitmap.Save("screen.png", ImageFormat.Png);
 
             using (var memoryStream = new MemoryStream())
             {
