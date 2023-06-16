@@ -30,7 +30,7 @@ namespace Monitoring
                         while (true)
                         {
                             // Get the size of the next data packet from the first 4 bytes
-                            byte[] sizeBytes = new byte[4];
+                            byte[] sizeBytes = new byte[5];
                             await stream.ReadAsync(sizeBytes, 0, 4);
                             int size = BitConverter.ToInt32(sizeBytes, 0);
 
@@ -44,7 +44,7 @@ namespace Monitoring
 
                             //Debug.WriteLine($"recv data: {data.Length}");
 
-                            var image = receiver.DecompressToImage(data);
+                            var image = sizeBytes[4] == 0x00 ? receiver.ByteArrayToImage(data) : receiver.DecompressToImage(data);
 
                             this.BeginInvoke(() =>
                             {

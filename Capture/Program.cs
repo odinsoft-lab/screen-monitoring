@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Linq;
 using System.Net.Sockets;
 
 namespace Capture;
@@ -28,7 +29,10 @@ public class Program
 
                         //Debug.WriteLine($"Sending data: {data.Length} bytes");
 
-                        await stream.WriteAsync(BitConverter.GetBytes(data.Length), 0, 4); // Send the length of the data as 4 bytes
+                        var header = new List<byte>(BitConverter.GetBytes(data.Length));
+                        header.Add(0x01);
+
+                        await stream.WriteAsync(header.ToArray(), 0, 5); // Send the length of the data as 4 bytes
                         await stream.WriteAsync(data, 0, data.Length);
 
                         await Task.Delay(DelayBetweenSendsMs);
