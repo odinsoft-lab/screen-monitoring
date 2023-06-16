@@ -37,7 +37,7 @@ namespace Monitoring
 
                     //listener.Stop();
 
-                    await Task.Delay(5);
+                    await Task.Delay(0);
                 }
             },
             TaskCreationOptions.LongRunning
