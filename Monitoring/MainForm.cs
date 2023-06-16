@@ -42,10 +42,9 @@ namespace Monitoring
                                 bytesRead += await stream.ReadAsync(data, bytesRead, size - bytesRead);
                             }
 
-                            Debug.WriteLine($"recv data: {data.Length}");
+                            //Debug.WriteLine($"recv data: {data.Length}");
 
-                            using MemoryStream ms = new MemoryStream(data);
-                            var image = Image.FromStream(ms);
+                            var image = receiver.DecompressToImage(data);
 
                             this.BeginInvoke(() =>
                             {

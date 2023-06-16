@@ -23,8 +23,10 @@ public class Program
 
                     while (true)
                     {
-                        var data = sender.CaptureScreen();
-                        Debug.WriteLine($"Sending data: {data.Length} bytes");
+                        var capture = sender.CaptureScreen();
+                        var data = sender.CompressData(capture);
+
+                        //Debug.WriteLine($"Sending data: {data.Length} bytes");
 
                         await stream.WriteAsync(BitConverter.GetBytes(data.Length), 0, 4); // Send the length of the data as 4 bytes
                         await stream.WriteAsync(data, 0, data.Length);

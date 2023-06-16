@@ -33,7 +33,7 @@ namespace Shared
             }
         }
 
-        public byte[] DecompressData(byte[] compressedData)
+        public Image DecompressToImage(byte[] compressedData)
         {
             using MemoryStream ms = new MemoryStream(compressedData);
             
@@ -50,7 +50,7 @@ namespace Shared
                 }
             }
 
-            return os.ToArray();
+            return Image.FromStream(os);
         }
 
         public Image ByteArrayToImage(byte[] bytes)
@@ -63,7 +63,7 @@ namespace Shared
         {
             var result = new Packet();
 
-            var total_data = new byte[256 * 1024];
+            var total_data = new byte[1024 * 1024];
 
             try
             {
