@@ -11,7 +11,7 @@ public class Program
         ApplicationConfiguration.Initialize();
 
         var sender = new Shared.Sender();
-        const int DelayBetweenSendsMs = 10; // 100ms delay between screen captures
+        const int DelayBetweenSendsMs = 0; // 100ms delay between screen captures
 
         while (true)
         {
