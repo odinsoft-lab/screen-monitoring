@@ -30,9 +30,7 @@ namespace Monitoring
                     this.BeginInvoke(() =>
                     {
                         //Debug.WriteLine($"recv data: {packet.data.Length}");
-
-                        var capture = receiver.ByteArrayToImage(packet.data);
-                        pictureBox1.Image = capture;
+                        pictureBox1.Image = packet.image;
                     });
 
                     //listener.Stop();

@@ -1,5 +1,7 @@
 ﻿#pragma warning disable
 
+using System.Drawing;
+
 namespace Shared
 {
     public class Packet
@@ -23,6 +25,12 @@ namespace Shared
         }
 
         public byte[] data
+        {
+            get;
+            set;
+        }
+
+        public Image image
         {
             get;
             set;

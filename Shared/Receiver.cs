@@ -12,29 +12,33 @@ namespace Shared
 {
     public class Receiver
     {
-        public Packet DeserializePacket(byte[] data)
-        {
-            string jsonString = Encoding.UTF8.GetString(data);
-            return JsonSerializer.Deserialize<Packet>(jsonString);
-        }
-
         public async Task<Packet> RecvDataByTCP(TcpListener listener)
         {
             var result = new Packet();
 
-            using TcpClient client = await listener.AcceptTcpClientAsync();
-            using NetworkStream stream = client.GetStream();
-            using MemoryStream ms = new MemoryStream();
-
-            var buffer = new byte[1024];
-            
-            int bytesRead;
-            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            using (TcpClient tc = await listener.AcceptTcpClientAsync())
             {
-                ms.Write(buffer, 0, bytesRead);
-            }
+                using NetworkStream ns = tc.GetStream();
+                using MemoryStream ms = new MemoryStream();
 
-            result.data = ms.ToArray();
+                var buffer = new byte[1024];
+
+                int bytesRead;
+
+                while ((bytesRead = await ns.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    ms.Write(buffer, 0, bytesRead);
+                }
+
+                using (var gs = new GZipStream(ms, CompressionMode.Decompress))
+                {
+                    using (var ds = new MemoryStream())
+                    {
+                        gs.CopyTo(ds);
+                        result.image = Image.FromStream(ds);
+                    }
+                }
+            }
 
             return result;
         }
@@ -72,15 +76,10 @@ namespace Shared
             return result;
         }
 
-        public Image ByteArrayToImage(byte[] byteArray)
+        public Packet DeserializePacket(byte[] data)
         {
-            using (var ms = new MemoryStream(byteArray))
-            using (var gs = new GZipStream(ms, CompressionMode.Decompress))
-            using (var ds = new MemoryStream())
-            {
-                gs.CopyTo(ds);
-                return Image.FromStream(ds);
-            }
+            string jsonString = Encoding.UTF8.GetString(data);
+            return JsonSerializer.Deserialize<Packet>(jsonString);
         }
     }
 }
