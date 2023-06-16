@@ -17,25 +17,39 @@ namespace Monitoring
             {
                 var receiver = new Shared.Receiver();
 
-                var listener = new TcpListener(IPAddress.Any, 8088);
-
                 while (true)
                 {
-                    //Debug.WriteLine("listen...");
+                    var listener = new TcpListener(IPAddress.Any, 8088);
 
-                    listener.Start();
-
-                    var packet = await receiver.RecvDataByTCP(listener);
-
-                    this.BeginInvoke(() =>
+                    try
                     {
-                        Debug.WriteLine($"recv data: {packet.data.Length}");
-                        pictureBox1.Image = packet.image;
-                    });
+                        while (true)
+                        {
+                            //Debug.WriteLine("listen...");
 
-                    //listener.Stop();
+                            listener.Start();
 
-                    await Task.Delay(1);
+                            var data = await receiver.RecvDataByTCP(listener);
+                            var image = receiver.ByteArrayToImage(data);
+
+                            this.BeginInvoke(() =>
+                            {
+                                pictureBox1.Image = image;
+                            });
+
+                            await Task.Delay(1);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
+                    finally
+                    {
+                        listener.Stop();
+
+                        await Task.Delay(1000);
+                    }
                 }
             },
             TaskCreationOptions.LongRunning

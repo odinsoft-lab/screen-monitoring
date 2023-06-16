@@ -1,4 +1,7 @@
-﻿namespace Capture;
+﻿using System.Diagnostics;
+using System.Net.Sockets;
+
+namespace Capture;
 
 public class Program
 {
@@ -13,13 +16,32 @@ public class Program
 
         while (true)
         {
-            var data = sender.CaptureScreen();
+            try
+            {
+                using (TcpClient client = new TcpClient())
+                {
+                    await client.ConnectAsync("192.168.0.5", 8088);
 
-            Console.WriteLine($"send data size: {data.Length}");
+                    using NetworkStream stream = client.GetStream();
 
-            await sender.SendDataByTCP("192.168.0.5", 8088, data);
+                    while (true)
+                    {
+                        var data = sender.CaptureScreen();
 
-            await Task.Delay(1);
+                        await stream.WriteAsync(data, 0, data.Length);
+
+                        await Task.Delay(1);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            finally
+            {
+                await Task.Delay(1000);
+            }
         }
 
         //Console.WriteLine("hit to exit...");

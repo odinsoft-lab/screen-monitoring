@@ -14,28 +14,31 @@ namespace Shared
 {
     public class Sender
     {
-        public byte[] SerializePacket(Packet packet)
+        public byte[] CaptureScreen()
         {
-            string jsonString = JsonSerializer.Serialize(packet);
-            return Encoding.UTF8.GetBytes(jsonString);
+            var bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+            }
+
+            using (var ms = new MemoryStream())
+            {
+                bitmap.Save(ms, ImageFormat.Jpeg);
+                return ms.ToArray();
+            }
         }
 
-        public async Task SendDataByTCP(string ipAddress, int port, byte[] data)
+        public byte[] CompressData(byte[] data)
         {
-            try
+            using var ms = new MemoryStream();
+         
+            using (var gs = new GZipStream(ms, CompressionMode.Compress))
             {
-                using (TcpClient client = new TcpClient())
-                {
-                    await client.ConnectAsync(ipAddress, port);
+                gs.Write(data, 0, data.Length);
+            }
 
-                    using NetworkStream stream = client.GetStream();
-                    await stream.WriteAsync(data, 0, data.Length);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex.Message);
-            }
+            return ms.ToArray();
         }
 
         public async Task SendDataByUDP(string serverIp, int serverPort, byte[] data, int packetSize)
@@ -74,30 +77,10 @@ namespace Shared
             }
         }
 
-        public byte[] CaptureScreen()
+        byte[] SerializePacket(Packet packet)
         {
-            var bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
-            }
-
-            //bitmap.Save("screen.png", ImageFormat.Png);
-
-            using (var ms = new MemoryStream())
-            {
-                bitmap.Save(ms, ImageFormat.Jpeg);
-                var data = ms.ToArray();
-
-                using (var cs = new MemoryStream())
-                using (var gs = new GZipStream(cs, CompressionMode.Compress))
-                {
-                    gs.Write(data, 0, data.Length);
-                    gs.Close();
-
-                    return cs.ToArray();
-                }
-            }
+            string jsonString = JsonSerializer.Serialize(packet);
+            return Encoding.UTF8.GetBytes(jsonString);
         }
     }
 }

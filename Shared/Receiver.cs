@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
@@ -12,10 +13,8 @@ namespace Shared
 {
     public class Receiver
     {
-        public async Task<Packet> RecvDataByTCP(TcpListener listener)
+        public async Task<byte[]> RecvDataByTCP(TcpListener listener)
         {
-            var result = new Packet();
-
             using (TcpClient tc = await listener.AcceptTcpClientAsync())
             {
                 using NetworkStream ns = tc.GetStream();
@@ -30,21 +29,34 @@ namespace Shared
                     ms.Write(buffer, 0, bytesRead);
                 }
 
-                ms.Position = 0; 
+                return ms.ToArray();
+            }
+        }
 
-                using (var gs = new GZipStream(ms, CompressionMode.Decompress))
+        public byte[] DecompressData(byte[] compressedData)
+        {
+            using MemoryStream ms = new MemoryStream(compressedData);
+            
+            using GZipStream gs = new GZipStream(ms, CompressionMode.Decompress);
+            using MemoryStream os = new MemoryStream();
+            {
+                var buffer = new byte[1024 * 1024];
+                
+                int bytesRead;
+
+                while ((bytesRead = gs.Read(buffer, 0, buffer.Length)) != 0)
                 {
-                    using (var ds = new MemoryStream())
-                    {
-                        gs.CopyTo(ds);
-
-                        //ds.Position = 0;
-                        result.image = Image.FromStream(ds);
-                    }
+                    os.Write(buffer, 0, bytesRead);
                 }
             }
 
-            return result;
+            return os.ToArray();
+        }
+
+        public Image ByteArrayToImage(byte[] bytes)
+        {
+            using MemoryStream ms = new MemoryStream(bytes);
+            return Image.FromStream(ms);
         }
 
         public Packet RecvDataByUDP(UdpClient client)
@@ -80,7 +92,7 @@ namespace Shared
             return result;
         }
 
-        public Packet DeserializePacket(byte[] data)
+        Packet DeserializePacket(byte[] data)
         {
             string jsonString = Encoding.UTF8.GetString(data);
             return JsonSerializer.Deserialize<Packet>(jsonString);
