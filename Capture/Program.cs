@@ -21,14 +21,16 @@ public class Program
                 using (TcpClient client = new TcpClient())
                 {
                     await client.ConnectAsync("192.168.0.5", 8088);
-
                     using NetworkStream stream = client.GetStream();
 
                     while (true)
                     {
                         var data = sender.CaptureScreen();
 
+                        Debug.WriteLine($"send data: {data.Length}");
+
                         await stream.WriteAsync(data, 0, data.Length);
+                        await stream.WriteAsync(new byte[0], 0, 0);
 
                         await Task.Delay(1);
                     }
