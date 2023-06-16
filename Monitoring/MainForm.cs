@@ -25,11 +25,12 @@ namespace Monitoring
                     {
                         while (true)
                         {
-                            //Debug.WriteLine("listen...");
-
                             listener.Start();
 
                             var data = await receiver.RecvDataByTCP(listener);
+
+                            Debug.WriteLine($"recv data: {data.Length}");
+
                             var image = receiver.ByteArrayToImage(data);
 
                             this.BeginInvoke(() =>
