@@ -21,7 +21,7 @@ namespace Shared
                 using NetworkStream ns = tc.GetStream();
                 using MemoryStream ms = new MemoryStream();
 
-                var buffer = new byte[1024];
+                var buffer = new byte[1024 * 1024];
 
                 int bytesRead;
 
@@ -30,11 +30,15 @@ namespace Shared
                     ms.Write(buffer, 0, bytesRead);
                 }
 
+                ms.Position = 0; 
+
                 using (var gs = new GZipStream(ms, CompressionMode.Decompress))
                 {
                     using (var ds = new MemoryStream())
                     {
                         gs.CopyTo(ds);
+
+                        //ds.Position = 0;
                         result.image = Image.FromStream(ds);
                     }
                 }

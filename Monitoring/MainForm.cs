@@ -29,13 +29,13 @@ namespace Monitoring
 
                     this.BeginInvoke(() =>
                     {
-                        //Debug.WriteLine($"recv data: {packet.data.Length}");
+                        Debug.WriteLine($"recv data: {packet.data.Length}");
                         pictureBox1.Image = packet.image;
                     });
 
                     //listener.Stop();
 
-                    await Task.Delay(0);
+                    await Task.Delay(1);
                 }
             },
             TaskCreationOptions.LongRunning

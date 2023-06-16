@@ -15,7 +15,7 @@ public class Program
         {
             var data = sender.CaptureScreen();
 
-            //Console.WriteLine($"send data size: {data.Length}");
+            Console.WriteLine($"send data size: {data.Length}");
 
             await sender.SendDataByTCP("192.168.0.5", 8088, data);
 
