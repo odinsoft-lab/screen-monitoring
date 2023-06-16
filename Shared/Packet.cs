@@ -24,13 +24,13 @@ namespace Shared
             set;
         }
 
-        public byte[] data
+        public byte[] header
         {
             get;
             set;
         }
 
-        public Image image
+        public byte[] data
         {
             get;
             set;

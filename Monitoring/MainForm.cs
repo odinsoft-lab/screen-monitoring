@@ -31,7 +31,7 @@ namespace Monitoring
                         {
                             // Get the size of the next data packet from the first 4 bytes
                             byte[] sizeBytes = new byte[5];
-                            await stream.ReadAsync(sizeBytes, 0, 4);
+                            await stream.ReadAsync(sizeBytes, 0, 5);
                             int size = BitConverter.ToInt32(sizeBytes, 0);
 
                             // Read the actual data
@@ -51,7 +51,7 @@ namespace Monitoring
                                 pictureBox1.Image = image;
                             });
 
-                            await Task.Delay(1);
+                            //await Task.Delay(1);
                         }
                     }
                     catch (Exception ex)
@@ -63,7 +63,7 @@ namespace Monitoring
                         listener.Stop();
                     }
 
-                    await Task.Delay(1000);
+                    //await Task.Delay(1000);
                 }
             },
             TaskCreationOptions.LongRunning

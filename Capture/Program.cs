@@ -11,7 +11,7 @@ public class Program
         ApplicationConfiguration.Initialize();
 
         var sender = new Shared.Sender();
-        const int DelayBetweenSendsMs = 100; // 100ms delay between screen captures
+        const int DelayBetweenSendsMs = 10; // 100ms delay between screen captures
 
         while (true)
         {
@@ -24,8 +24,8 @@ public class Program
 
                     while (true)
                     {
-                        var capture = sender.CaptureScreen();
-                        var data = sender.CompressData(capture);
+                        var data = sender.CaptureScreen();
+                        data = sender.CompressData(data);
 
                         //Debug.WriteLine($"Sending data: {data.Length} bytes");
 
@@ -44,7 +44,7 @@ public class Program
                 Debug.WriteLine($"Error sending data: {ex.Message}");
             }
 
-            await Task.Delay(1000);
+            //await Task.Delay(1000);
         }
     }
 }
