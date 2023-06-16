@@ -21,7 +21,7 @@ namespace Monitoring
 
                 while (true)
                 {
-                    Debug.WriteLine("listen...");
+                    //Debug.WriteLine("listen...");
 
                     listener.Start();
 
@@ -29,13 +29,13 @@ namespace Monitoring
 
                     this.BeginInvoke(() =>
                     {
-                        Debug.WriteLine($"recv data: {packet.data.Length}");
+                        //Debug.WriteLine($"recv data: {packet.data.Length}");
 
                         var capture = receiver.ByteArrayToImage(packet.data);
                         pictureBox1.Image = capture;
                     });
 
-                    listener.Stop();
+                    //listener.Stop();
 
                     await Task.Delay(5);
                 }

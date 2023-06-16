@@ -54,7 +54,7 @@ namespace Shared
                     var packet = DeserializePacket(recv_data);
                     Array.Copy(packet.data, 0, total_data, packet.seqno * packet.size, packet.data.Length);
 
-                    Debug.WriteLine($"recv packet: {packet.seqno} / {packet.lastno}");
+                    //Debug.WriteLine($"recv packet: {packet.seqno} / {packet.lastno}");
 
                     // 모든 패킷을 받았다면 루프를 종료합니다.
                     if (packet.seqno >= packet.lastno - 1)
