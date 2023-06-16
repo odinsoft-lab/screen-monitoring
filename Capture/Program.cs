@@ -9,10 +9,8 @@ public class Program
     {
         ApplicationConfiguration.Initialize();
 
-        Console.WriteLine("hit to capture & send...");
-        Console.ReadLine();
-
         var sender = new Shared.Sender();
+        const int DelayBetweenSendsMs = 100; // 100ms delay between screen captures
 
         while (true)
         {
@@ -26,27 +24,21 @@ public class Program
                     while (true)
                     {
                         var data = sender.CaptureScreen();
+                        Debug.WriteLine($"Sending data: {data.Length} bytes");
 
-                        Debug.WriteLine($"send data: {data.Length}");
-
+                        await stream.WriteAsync(BitConverter.GetBytes(data.Length), 0, 4); // Send the length of the data as 4 bytes
                         await stream.WriteAsync(data, 0, data.Length);
-                        await stream.WriteAsync(new byte[0], 0, 0);
 
-                        await Task.Delay(1);
+                        await Task.Delay(DelayBetweenSendsMs);
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Debug.WriteLine($"Error sending data: {ex.Message}");
             }
-            finally
-            {
-                await Task.Delay(1000);
-            }
-        }
 
-        //Console.WriteLine("hit to exit...");
-        //Console.ReadLine();
+            await Task.Delay(1000);
+        }
     }
 }

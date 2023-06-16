@@ -20,18 +20,32 @@ namespace Monitoring
                 while (true)
                 {
                     var listener = new TcpListener(IPAddress.Any, 8088);
+                    listener.Start();
 
                     try
                     {
+                        using TcpClient client = await listener.AcceptTcpClientAsync();
+                        using NetworkStream stream = client.GetStream();
+
                         while (true)
                         {
-                            listener.Start();
+                            // Get the size of the next data packet from the first 4 bytes
+                            byte[] sizeBytes = new byte[4];
+                            await stream.ReadAsync(sizeBytes, 0, 4);
+                            int size = BitConverter.ToInt32(sizeBytes, 0);
 
-                            var data = await receiver.RecvDataByTCP(listener);
+                            // Read the actual data
+                            byte[] data = new byte[size];
+                            int bytesRead = 0;
+                            while (bytesRead < size)
+                            {
+                                bytesRead += await stream.ReadAsync(data, bytesRead, size - bytesRead);
+                            }
 
                             Debug.WriteLine($"recv data: {data.Length}");
 
-                            var image = receiver.ByteArrayToImage(data);
+                            using MemoryStream ms = new MemoryStream(data);
+                            var image = Image.FromStream(ms);
 
                             this.BeginInvoke(() =>
                             {
@@ -43,14 +57,14 @@ namespace Monitoring
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
+                        Debug.WriteLine($"Error receiving data: {ex.Message}");
                     }
                     finally
                     {
                         listener.Stop();
-
-                        await Task.Delay(1000);
                     }
+
+                    await Task.Delay(1000);
                 }
             },
             TaskCreationOptions.LongRunning
