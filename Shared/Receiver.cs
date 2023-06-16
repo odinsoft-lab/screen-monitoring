@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -73,9 +74,12 @@ namespace Shared
 
         public Image ByteArrayToImage(byte[] byteArray)
         {
-            using (var memoryStream = new MemoryStream(byteArray))
+            using (var ms = new MemoryStream(byteArray))
+            using (var gs = new GZipStream(ms, CompressionMode.Decompress))
+            using (var ds = new MemoryStream())
             {
-                return Image.FromStream(memoryStream);
+                gs.CopyTo(ds);
+                return Image.FromStream(ds);
             }
         }
     }

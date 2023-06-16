@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO.Compression;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -83,10 +84,19 @@ namespace Shared
 
             //bitmap.Save("screen.png", ImageFormat.Png);
 
-            using (var memoryStream = new MemoryStream())
+            using (var ms = new MemoryStream())
             {
-                bitmap.Save(memoryStream, ImageFormat.Jpeg);
-                return memoryStream.ToArray();
+                bitmap.Save(ms, ImageFormat.Jpeg);
+                var data = ms.ToArray();
+
+                using (var cs = new MemoryStream())
+                using (var gs = new GZipStream(cs, CompressionMode.Compress))
+                {
+                    gs.Write(data, 0, data.Length);
+                    gs.Close();
+
+                    return cs.ToArray();
+                }
             }
         }
     }
