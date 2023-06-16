@@ -4,6 +4,8 @@ public class Program
 {
     static async Task Main(string[] args)
     {
+        ApplicationConfiguration.Initialize();
+
         Console.WriteLine("hit to capture & send...");
         Console.ReadLine();
 
@@ -13,11 +15,11 @@ public class Program
         {
             var data = sender.CaptureScreen();
 
-            Console.WriteLine($"send data size: {data.Length}");
+            //Console.WriteLine($"send data size: {data.Length}");
 
-            await sender.SendDataByTCP("127.0.0.1", 8088, data);
+            await sender.SendDataByTCP("192.168.0.5", 8088, data);
 
-            await Task.Delay(10);
+            await Task.Delay(1);
         }
 
         //Console.WriteLine("hit to exit...");
