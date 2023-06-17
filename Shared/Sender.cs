@@ -14,6 +14,17 @@ namespace Shared
 {
     public class Sender
     {
+        public Bitmap CaptureFrame()
+        {
+            var bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.CopyFromScreen(0, 0, 0, 0, bitmap.Size);
+            }
+
+            return bitmap;
+        }
+
         public byte[] CaptureScreen()
         {
             var bitmap = new Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height);
