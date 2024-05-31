@@ -6,9 +6,13 @@ namespace Monitoring
 {
     public partial class MainForm : Form
     {
+        private Rectangle originamBounds;
+
         public MainForm()
         {
             InitializeComponent();
+
+            this.originamBounds = this.Bounds;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -74,9 +78,19 @@ namespace Monitoring
         {
             if (e.KeyCode == Keys.Escape)
             {
-                if (this.WindowState == FormWindowState.Maximized)
+                //if (this.WindowState == FormWindowState.Maximized)
+                //{
+                //    this.WindowState = FormWindowState.Normal;
+
+                //    this.FormBorderStyle = FormBorderStyle.Sizable;
+                //    this.Bounds = this.originamBounds;
+                //    this.TopMost = false;
+                //}
+
+                if (this.FormBorderStyle == FormBorderStyle.None)
                 {
-                    this.WindowState = FormWindowState.Normal;
+                    this.FormBorderStyle = FormBorderStyle.Sizable;
+                    this.Bounds = this.originamBounds;
                 }
             }
         }
@@ -86,6 +100,13 @@ namespace Monitoring
             if (this.WindowState == FormWindowState.Maximized)
             {
                 this.FormBorderStyle = FormBorderStyle.None;
+                this.WindowState = FormWindowState.Normal;
+
+                var currentScreen = Screen.FromControl(this);
+                if (currentScreen != null)
+                {
+                    this.Bounds = currentScreen.Bounds;
+                }
             }
         }
     }
