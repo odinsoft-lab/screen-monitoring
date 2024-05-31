@@ -48,9 +48,12 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1066, 778);
             Controls.Add(pictureBox1);
+            KeyPreview = true;
             Name = "MainForm";
-            Text = "Form1";
+            Text = "Capture";
             Load += MainForm_Load;
+            KeyDown += MainForm_KeyDown;
+            Resize += MainForm_Resize;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }
