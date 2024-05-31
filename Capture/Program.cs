@@ -1,8 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Net.Sockets;
 
 namespace Capture;
 
@@ -48,9 +45,9 @@ public class Program
         // 모든 큐와 스레드 정리
         foreach (ConcurrentQueue<Bitmap> frameQueue in frameQueues)
         {
-            while (frameQueue.TryDequeue(out Bitmap frame))
+            while (frameQueue.TryDequeue(out Bitmap? frame))
             {
-                frame.Dispose();
+                frame?.Dispose();
             }
         }
 
@@ -94,6 +91,8 @@ public class Program
 
         //    //await Task.Delay(1000);
         //}
+
+        await Task.CompletedTask;
     }
 
     static void CaptureFrames()
@@ -119,7 +118,7 @@ public class Program
         while (true)
         {
             // 큐에서 최신 프레임 가져오기
-            if (frameQueue.TryPeek(out Bitmap frame))
+            if (frameQueue.TryPeek(out Bitmap? frame))
             {
                 // 해당 IP의 연결 상태 확인
                 bool isConnected = connectionStatus[targetIP];
@@ -131,7 +130,7 @@ public class Program
                 }
 
                 // 프레임 해제
-                frame.Dispose();
+                frame?.Dispose();
             }
 
             // 잠시 대기
@@ -139,13 +138,13 @@ public class Program
         }
     }
 
-    static void TransmitFrame(Bitmap frame, string targetIP)
+    static void TransmitFrame(Bitmap? frame, string targetIP)
     {
         // 프레임을 해당 IP로 전송하는 로직 구현
         // ...
 
         // 전송 완료 후 프레임 해제
-        frame.Dispose();
+        frame?.Dispose();
     }
 
     static void CheckConnectionStatus()
