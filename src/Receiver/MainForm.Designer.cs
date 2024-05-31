@@ -52,8 +52,6 @@
             Name = "MainForm";
             Text = "Capture";
             Load += MainForm_Load;
-            KeyDown += MainForm_KeyDown;
-            Resize += MainForm_Resize;
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
         }

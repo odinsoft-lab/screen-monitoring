@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Capture;
@@ -11,11 +12,36 @@ public class Program
 
     static async Task Main(string[] args)
     {
+        if (args.Length < 2)
+        {
+            Console.WriteLine("Please enter IP address and port number.");
+            return;
+        }
+
+        if (!IPAddress.TryParse(args[0], out IPAddress? ipAddress))
+        {
+            Console.WriteLine("Invalid IP address.");
+            return;
+        }
+
+        if (!int.TryParse(args[1], out int port))
+        {
+            Console.WriteLine("The port number is not valid.");
+            return;
+        }
+
+        Console.WriteLine($"IP address: {ipAddress}, port number: {port}");
+
         ApplicationConfiguration.Initialize();
 
+        await StartScreenCapture(ipAddress, port);
+    }
+
+    static async Task StartScreenCapture(IPAddress ipAddress, int port)
+    { 
         var loop_exit = false;
 
-        Console.WriteLine("화면 캡쳐를 시작 합니다.");
+        Console.WriteLine("start capturing the screen.");
 
         while (!loop_exit)
         {
@@ -23,7 +49,7 @@ public class Program
             {
                 using (TcpClient client = new TcpClient())
                 {
-                    await client.ConnectAsync("192.168.0.27", 8088);
+                    await client.ConnectAsync(ipAddress, port);
                     using NetworkStream stream = client.GetStream();
 
                     while (true)
@@ -35,15 +61,13 @@ public class Program
                             {
                                 loop_exit = true;
 
-                                Console.WriteLine("화면 캡쳐를 종료 합니다.");
+                                Console.WriteLine("exits the screen capture.");
                                 break;
                             }
                         }
 
                         var data = sender.CaptureScreen();
                         data = sender.CompressData(data);
-
-                        //Debug.WriteLine($"Sending data: {data.Length} bytes");
 
                         var header = new List<byte>(BitConverter.GetBytes(data.Length));
                         header.Add(0x01);
@@ -57,7 +81,7 @@ public class Program
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error sending data: {ex.Message}");
+                Debug.WriteLine($"sender: {ex.Message}");
             }
 
             await Task.Delay(1000);

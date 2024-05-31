@@ -1,3 +1,4 @@
+using Receiver.Properties;
 using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
@@ -6,13 +7,9 @@ namespace Monitoring
 {
     public partial class MainForm : Form
     {
-        private Rectangle originamBounds;
-
         public MainForm()
         {
             InitializeComponent();
-
-            this.originamBounds = this.Bounds;
         }
 
         private void MainForm_Load(object sender, EventArgs e)
@@ -23,7 +20,7 @@ namespace Monitoring
 
                 while (true)
                 {
-                    var listener = new TcpListener(IPAddress.Any, 8088);
+                    var listener = new TcpListener(IPAddress.Any, Settings.Default.ListenPort);
                     listener.Start();
 
                     try
@@ -46,68 +43,28 @@ namespace Monitoring
                                 bytesRead += await stream.ReadAsync(data, bytesRead, size - bytesRead);
                             }
 
-                            //Debug.WriteLine($"recv data: {data.Length}");
-
                             var image = sizeBytes[4] == 0x00 ? receiver.ByteArrayToImage(data) : receiver.DecompressToImage(data);
 
                             this.BeginInvoke(() =>
                             {
                                 pictureBox1.Image = image;
                             });
-
-                            //await Task.Delay(1);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error receiving data: {ex.Message}");
+                        Debug.WriteLine($"receiver: {ex.Message}");
                     }
                     finally
                     {
                         listener.Stop();
                     }
 
-                    //await Task.Delay(1000);
+                    await Task.Delay(1000);
                 }
             },
             TaskCreationOptions.LongRunning
             );
-        }
-
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Escape)
-            {
-                //if (this.WindowState == FormWindowState.Maximized)
-                //{
-                //    this.WindowState = FormWindowState.Normal;
-
-                //    this.FormBorderStyle = FormBorderStyle.Sizable;
-                //    this.Bounds = this.originamBounds;
-                //    this.TopMost = false;
-                //}
-
-                if (this.FormBorderStyle == FormBorderStyle.None)
-                {
-                    this.FormBorderStyle = FormBorderStyle.Sizable;
-                    this.Bounds = this.originamBounds;
-                }
-            }
-        }
-
-        private void MainForm_Resize(object sender, EventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Maximized)
-            {
-                this.FormBorderStyle = FormBorderStyle.None;
-                this.WindowState = FormWindowState.Normal;
-
-                var currentScreen = Screen.FromControl(this);
-                if (currentScreen != null)
-                {
-                    this.Bounds = currentScreen.Bounds;
-                }
-            }
         }
     }
 }

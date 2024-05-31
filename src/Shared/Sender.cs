@@ -76,8 +76,6 @@ namespace Shared
                         var send_data = SerializePacket(packet);
                         udp_client.Send(send_data, send_data.Length, end_point);
 
-                        //Debug.WriteLine($"send packet: {i} / {lastno}");
-
                         await Task.Delay(500);
                     }
                 }
