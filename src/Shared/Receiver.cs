@@ -8,7 +8,7 @@ using System.Text.Json;
 
 #pragma warning disable
 
-namespace Shared
+namespace Monitoring.Shared
 {
     public class Receiver
     {

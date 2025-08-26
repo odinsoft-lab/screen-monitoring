@@ -2,7 +2,7 @@
 
 using System.Drawing;
 
-namespace Shared
+namespace Monitoring.Shared
 {
     public class Packet
     {

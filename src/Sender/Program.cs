@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace Capture;
+namespace Monitoring.Sender;
 
 public class Program
 {

@@ -1,4 +1,4 @@
-# screen-monitoring
+# Screen.Monitoring
 
 A minimal Windows screen capture and real-time monitoring sample. It captures the primary screen on the sender machine and streams frames over TCP to a receiver that displays them in a Windows Forms UI. Built with .NET 8.
 

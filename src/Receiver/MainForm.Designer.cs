@@ -1,4 +1,4 @@
-﻿namespace Monitoring
+﻿namespace Monitoring.Receiver
 {
     partial class MainForm
     {
