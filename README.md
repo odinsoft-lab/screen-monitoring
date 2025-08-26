@@ -1,22 +1,22 @@
-# Screen.Capture
+# screen.capture
 
-A minimal Windows screen capture and real-time sample. It captures the primary screen on the sender machine and streams frames over TCP to a receiver that displays them in a Windows Forms UI. Built with .NET 8.
+Minimal Windows screen capture and real-time streaming sample. The sender captures the primary screen, JPEG-encodes the frame, GZip-compresses it, and streams it over TCP to a WinForms receiver that displays the image. Built with .NET 8.
 
 ## Overview
 
-- Transport: TCP (length-prefixed frames). A UDP helper is included in `Shared` but not used in the main demo flow.
-- Encoding: Full-screen capture → JPEG encode → GZip compress.
-- UI: WinForms app (`Receiver`) renders frames into a PictureBox.
+- Transport: TCP with a simple length-prefixed framing. A UDP helper exists in `Shared` (for experiments) but is not used by the main path.
+- Encoding: Full-screen capture → JPEG → GZip.
+- UI: WinForms app (`Receiver`) renders frames in a PictureBox.
 
 ## Project structure
 
 - `src/Shared`
-  - `Sender`: screen capture, JPEG encoding, GZip compression; also contains a UDP send utility (sample)
-  - `Receiver`: TCP receive helpers, GZip decompression, byte[] → Image conversion
-  - `Packet`: structure for UDP framing (not used by the default TCP path)
-- `src/Sender`: console app that sends frames to a target IP:Port at a short interval
+  - `Sender`: screen capture, JPEG encoding, GZip compression; includes a UDP send utility (sample)
+  - `Receiver`: TCP receive helpers, GZip decompression, byte[] → Image
+  - `Packet`: DTO for UDP framing (not used by the default TCP path)
+- `src/Sender`: console app that sends frames to a target IP:Port in a loop
 - `src/Receiver`: WinForms app that displays incoming frames
-- Solution: `ScreenCapture.sln`
+- Solution: `screen.capture.sln`
 
 ## Protocol (wire format)
 
@@ -25,13 +25,13 @@ For each frame sent over TCP:
 1) 5-byte header
    - 4 bytes: payload length (little-endian Int32)
    - 1 byte: compression flag (`0x01` = compressed, `0x00` = uncompressed)
-2) Payload: the frame bytes (JPEG if uncompressed; GZip(JPEG) if compressed)
+2) Payload: frame bytes (JPEG if uncompressed; GZip(JPEG) if compressed)
 
-Default inter-frame delay is about 10 ms, but actual FPS depends on your machine and network.
+The sender currently always compresses (`0x01`). The receiver handles both modes. Default inter-frame delay is 10 ms, but actual FPS depends on hardware and network.
 
 ## Requirements
 
-- Windows 10 or later
+- Windows 10 or later (WinForms + primary screen capture)
 - .NET SDK 8.0+
 
 ## Quick start
@@ -40,7 +40,7 @@ Default inter-frame delay is about 10 ms, but actual FPS depends on your machine
 
 ```pwsh
 # Run at the repository root (where README.md resides)
-dotnet build .\ScreenCapture.sln
+dotnet build .\screen.capture.sln
 ```
 
 2) Start the receiver
@@ -61,6 +61,7 @@ dotnet run --project .\src\Sender\Sender.csproj -- 127.0.0.1 8088
 
 - For same-machine tests use `127.0.0.1` or `localhost`.
 - For cross-machine tests, use the receiver machine’s IP and allow the port through Windows Firewall.
+- Press `Esc` in the sender console to stop the capture loop.
 
 ## Features
 
@@ -72,7 +73,7 @@ dotnet run --project .\src\Sender\Sender.csproj -- 127.0.0.1 8088
 ## Limitations
 
 - Windows-only (relies on WinForms and `Screen.PrimaryScreen`)
-- No encryption/auth (intended as a learning/demo project)
+- No encryption/authentication (intended as a learning/demo project)
 - Latency and dropped frames may occur depending on network conditions
 - CPU usage can be high (tight loop capture + encode + compress)
 - UDP send helper exists but the default demo path is TCP-based
@@ -85,18 +86,15 @@ dotnet run --project .\src\Sender\Sender.csproj -- 127.0.0.1 8088
   - Allow the receiver’s listen port through Windows Firewall
 - Slow transfer or high CPU usage
   - Increase the capture delay (`DelayBetweenSendsMs` in `src/Sender/Program.cs`)
-  - Consider tuning JPEG quality/encoding strategy (currently default Image.Save JPEG)
+  - Consider adjusting JPEG quality via a custom encoder (current code uses default Image.Save JPEG)
 - Multi-monitor
   - Only `Screen.PrimaryScreen` is captured; extend to target a specific monitor/region if needed
 
-## Roadmap ideas
+## Docs
 
-- Make JPEG quality, resolution, and frame rate configurable and adaptive
-- Multi-monitor and window/region capture support
-- TLS or pre-encryption (e.g., AES) and authentication
-- More efficient binary protocol and pipeline optimization
-- UDP/RTP sample path with reordering/retransmission handling
-- Optional input control (remote mouse/keyboard) with strong security
+- Roadmap: `docs/ROADMAP.md`
+- Tasks: `docs/TASK.md`
+- Contributing: `docs/CONTRIBUTNG.md`
 
 ## Directory layout
 
@@ -105,12 +103,12 @@ src/
   Receiver/
   Sender/
   Shared/
-ScreenCapture.sln
+screen.capture.sln
 ```
 
 ## License
 
-No license file is included. Add a license that fits your usage before distributing.
+Licensed under the MIT License. See `LICENSE.md` for details.
 
 ## Notes
 
