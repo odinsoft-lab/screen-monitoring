@@ -1,4 +1,4 @@
-# screen.capture
+# Screen Capture
 
 Minimal Windows screen capture and real-time streaming sample. The sender captures the primary screen, JPEG-encodes the frame, GZip-compresses it, and streams it over TCP to a WinForms receiver that displays the image. Built with .NET 8.
 
