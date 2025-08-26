@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Monitoring.Receiver
+namespace Capture.Receiver
 {
     public partial class MainForm : Form
     {

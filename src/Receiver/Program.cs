@@ -1,4 +1,4 @@
-namespace Monitoring.Receiver
+namespace Capture.Receiver
 {
     internal static class Program
     {

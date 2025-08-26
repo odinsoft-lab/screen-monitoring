@@ -1,6 +1,6 @@
 # Roadmap
 
-High-level plan for improving Screen.Monitoring. Items are grouped into milestones. This is a small demo project; scope should stay tight and practical.
+High-level plan for improving Screen.Capture. Items are grouped into milestones. This is a small demo project; scope should stay tight and practical.
 
 ## Milestone 0.1 — Baseline (current)
 

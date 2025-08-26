@@ -1,4 +1,4 @@
-# Contributing to Screen.Monitoring
+# Contributing to Screen.Capture
 
 Thanks for your interest in contributing! This repository is a small .NET 8 sample that streams the primary screen from a sender to a Windows Forms receiver over TCP.
 
@@ -25,7 +25,7 @@ This guide explains how to set up your environment, propose changes, and submit 
 ```pwsh
 # Clone your fork or the upstream repo
 # git clone <repo-url>
-# cd screen.monitoring
+# cd screen.capture
 
 # Build the solution at the repo root
  dotnet build .\ScreenCapture.sln

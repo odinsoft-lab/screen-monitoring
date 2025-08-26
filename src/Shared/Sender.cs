@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 #pragma warning disable
 
-namespace Monitoring.Shared
+namespace Capture.Shared
 {
     public class Sender
     {
